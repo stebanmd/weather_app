@@ -22,8 +22,8 @@ export class WeatherProvider {
     return this.http.get(this.url + 'locale/city?name='+city+'&state='+state+'&token=' + this.apiKey)
   }
 
-  getCurrentWeather() {
-    return this.http.get(this.url + 'weather/locale/5346/current?token=' + this.apiKey)
+  getCurrentWeather(locationId) {
+    return this.http.get(this.url + 'weather/locale/'+ locationId +'/current?token=' + this.apiKey)
   }
   
 

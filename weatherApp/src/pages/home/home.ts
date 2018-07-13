@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 import { WeatherProvider } from '../../providers/weather/weather';
+import { Storage } from '@ionic/storage';
 
 @Component({
   selector: 'page-home',
@@ -11,31 +12,37 @@ export class HomePage {
   weather: any;
   location: {
     city: string,
-    state: string
+    state: string,
+    id: number
   };
 
-  constructor(public navCtrl: NavController, private weatherProv: WeatherProvider) {
+  constructor(public navCtrl: NavController,
+    private weatherProv: WeatherProvider,
+    private storage: Storage) {
 
   }
 
   ionViewWillEnter() {
-    this.location = {
-      city: "Porto Alegre",
-      state: "RS"
-    }
-    
-    this.weatherProv.getLocaleId(this.location.city, this.location.state)
-      .subscribe((res: Array<any>) => {
-        
-        if (res.length == 0) {
-          alert('404 - City not found')
+    this.storage.get('location').then(val => {
+      if (val) {
+        this.location = JSON.parse(val);
+      } else {
+        // default value
+        this.location = {
+          city: 'Porto Alegre',
+          state: 'RS',
+          id: 5346
         }
-        else {
-          this.weatherProv.getCurrentWeather()
-            .subscribe(w => {
-              this.weather = w;
-            })
-        }
+      }
+
+      this.loadWeather();
+    });
+  }
+
+  private loadWeather() {
+    this.weatherProv.getCurrentWeather(this.location.id)
+      .subscribe(w => {
+        this.weather = w;
       });
   }
 }
